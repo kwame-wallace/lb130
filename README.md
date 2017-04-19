@@ -3,7 +3,7 @@
 
 This program will give you control of your Lb130 TP-Link smart light bulbs from the windows command line.
 
-The program may work with th the LB120 by ommitting the color option - but this has not been tested.
+The program may work with the LB120 by ommitting the color option - but this has not been tested.
 
 
 
