@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Lb130.DTO;
+using Newtonsoft.Json;
+using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Net;
@@ -6,8 +9,6 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using Lb130.DTO;
-using Newtonsoft.Json;
 
 namespace Lb130.Helper
 {
@@ -21,9 +22,7 @@ namespace Lb130.Helper
                 tempChange = $"\"color_temp\":{temp},";
 
                 //if (color != null)
-                //{
                 //    Console.WriteLine($"Temperature {temp}K overrides color {color.Value} (the color is ignored)");
-                //}
 
                 //color = ImageUtils.GetRgbFromK(temp);
             }
@@ -35,8 +34,7 @@ namespace Lb130.Helper
                 var hue = Math.Round(c.GetHue(), 2);
                 var saturation = Math.Round(c.GetSaturation() * 100, 2);
                 var lightness = Math.Round(c.GetBrightness() * 100, 2);
-                colorchange =
-                    $"\"hue\":{hue},\"saturation\":{saturation},\"color_temp\":0,\"brightness\":{lightness},";
+                colorchange = $"\"hue\":{hue},\"saturation\":{saturation},\"color_temp\":0,\"brightness\":{lightness},";
             }
 
             var bightnessChange = string.Empty;
@@ -130,15 +128,16 @@ namespace Lb130.Helper
             return Encoding.UTF7.GetString(result);
         }
 
-        public static bool WaitForBulb(string host)
+        public static bool QuitWaitingForBulb(string host)
         {
             var pinger = new Ping();
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            var linebreak = false;
+            var status = IPStatus.Unknown;
             try
             {
-                var linebreak = false;
-                var status = IPStatus.Unknown;
-
-                for (var i = 0; i < 120; i++)
+                while (stopwatch.Elapsed.Seconds < 45)
                 {
                     var reply = pinger.Send(host);
 
@@ -150,17 +149,14 @@ namespace Lb130.Helper
 
                     Thread.Sleep(1000);
 
-                    if (i > 2)
-                    {
-                        Console.Write($"lb130: Connecting... Waiting for bulb ({i} seconds)       \r");
-                        linebreak = true;
-                    }
+                    if (stopwatch.Elapsed.Seconds <= 2) continue;
+
+                    Console.Write($"lb130: Connecting... Waiting for bulb ({stopwatch.Elapsed.Seconds} seconds)       \r");
+                    linebreak = true;
                 }
 
                 if (linebreak)
-                {
                     Console.WriteLine();
-                }
 
                 if (status != IPStatus.Success)
                 {

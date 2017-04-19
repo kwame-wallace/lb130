@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Net;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Lb130.Extension;
+﻿using Lb130.Extension;
 using Lb130.Helper;
 using NDesk.Options;
+using System;
+using System.Drawing;
 
 namespace Lb130
 {
@@ -112,7 +103,7 @@ namespace Lb130
             }
 
 
-            if (Bulb.WaitForBulb(host)) return;
+            if (Bulb.QuitWaitingForBulb(host)) return;
 
             var response = Bulb.Send(host, onOff, color, temp, brightness, transition);
             Console.WriteLine($"response: {response.ToJsonString()}");
@@ -121,9 +112,9 @@ namespace Lb130
         private static void ShowHelp(OptionSet p)
         {
             Console.WriteLine();
-            Console.WriteLine("Usage: lb130 [OPTIONS]");
+            Console.WriteLine("usage: lb130 [OPTIONS]");
             Console.WriteLine();
-            Console.WriteLine("Options:");
+            Console.WriteLine("options:");
             p.WriteOptionDescriptions(Console.Out);
             Console.WriteLine();
         }
